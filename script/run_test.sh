@@ -109,7 +109,7 @@ echo "docker logs -f $docker_id"
 #     RUN TEST      #
 # ================= #
 
-python3 -u my_neo4j_test.py | tee -a  ${__dir}/neo4j/my_neo4j_test.log
+python3 -u ${__dir}/my_neo4j_test.py | tee -a  ${__dir}/neo4j/my_neo4j_test.log
 
 docker logs ${docker_id} > ${__dir}/neo4j/docker_neo4j.log
 
