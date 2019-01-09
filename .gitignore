@@ -1,0 +1,3 @@
+target/
+script/neo4j/
+script/__pycache__/
