@@ -6,13 +6,29 @@ To run the tests it is required:
    * docker
    * python3
    * Neo4j Bolt Driver 1.7 for Python
+   * curl
+   
+for the c test, ancomment line 191 in ./script/run_test.sh   
+   * gcc
+   * c-driver
 
 cd script
 ./run_test.sh
 
 # EXAMPLE RESULTS
-Times load and save sub-graph:
- * server: procedure returned after      1718 
- * client: session.run() returned after  3004
 
- * When calling the procedure from the neo4j browser, the time measured is closer to the one on the server side.
+=========================================================
+| RESULT run_python:            
+| * server: procedure returned after      798 
+| * client: session.run() returned after  1916
+=========================================================
+=========================================================
+| RESULT run_rest:            
+| * server: procedure returned after      435 
+| * client: session.run() returned after  1.480s
+=========================================================
+
+When performing the population of the graph with the python function, and calling the procedure from the neo4j browser,
+one gets
+Started streaming 1 records after 475 ms and completed after 475 ms.
+and the time on the server side is 1/2 ms lower.
