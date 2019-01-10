@@ -8,7 +8,7 @@ To run the tests it is required:
    * Neo4j Bolt Driver 1.7 for Python
    * curl
    
-for the c test, ancomment line 191 in ./script/run_test.sh   
+for the c test, comment/uncomment line 191 in ./script/run_test.sh   
    * gcc
    * c-driver
 
@@ -17,16 +17,13 @@ cd script
 
 # EXAMPLE RESULTS
 
-=========================================================
-| RESULT run_python:            
-| * server: procedure returned after      798 
-| * client: session.run() returned after  1916
-=========================================================
-=========================================================
-| RESULT run_rest:            
-| * server: procedure returned after      435 
-| * client: session.run() returned after  1.480s
-=========================================================
+RESULT run_python:            
+ * server: procedure returned after      798 
+ * client: session.run() returned after  1916
+
+RESULT run_rest:            
+ * server: procedure returned after      435 
+ * client: session.run() returned after  1.480s
 
 When performing the population of the graph with the python function, and calling the procedure from the neo4j browser,
 one gets
