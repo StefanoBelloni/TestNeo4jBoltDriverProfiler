@@ -1,0 +1,22 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================================================
+| RESULT run_python:            
+| * server: procedure returned after      758 
+| * client: session.run() returned after  1750
+=========================================================
+=========================================================
+| RESULT run_rest:            
+| * server: procedure returned after      436 
+| * client: session.run() returned after  1.402s
+=========================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================================================
+| RESULT run_python:            
+| * server: procedure returned after      798 
+| * client: session.run() returned after  1916
+=========================================================
+=========================================================
+| RESULT run_rest:            
+| * server: procedure returned after      435 
+| * client: session.run() returned after  1.480s
+=========================================================

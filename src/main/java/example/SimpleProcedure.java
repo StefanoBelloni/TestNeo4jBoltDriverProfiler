@@ -37,6 +37,8 @@ public class SimpleProcedure
     {
 
         log.info("populate ... start");
+        log.info("step is: " + n);
+        log.info("value is: " + l);
         FunctionTimer timer = new FunctionTimer();
         timer.startTimer("populate");
         try (Transaction tx = db.beginTx()) {
@@ -79,12 +81,14 @@ public class SimpleProcedure
     {
 
         log.info("calulate_and_save");
+        log.info("start is: " + start);
+        log.info("end is: " + end);
         Map<Long, List<Node>> nodesMap = new HashMap<>();
 
         FunctionTimer timer = new FunctionTimer();
         FunctionTimer timer_all = new FunctionTimer();
         timer_all.startTimer("calculate_and_save");
-
+        int n_nodes = 0;
         timer.startTimer("loading nodes ...");
         for ( Long i = start; i < end; ++i ) {
             ResourceIterator<Node> n;
@@ -99,11 +103,15 @@ public class SimpleProcedure
                for (Relationship r : nn.getRelationships(RelTypes.BELONGS)) {
                   Node n_c = r.getOtherNode(nn);
                   nodes.add(n_c);
+                  n_nodes++;
                }
             nodesMap.put(i, nodes);
             }
         }
         log.info(timer.stopTimer());
+        log.info("read and saved  ");
+        log.info("  * parents", nodesMap.size());
+        log.info("  * child-nodes", n_nodes);
 
         timer.startTimer("nodes not cached ...");
         Node c = db.findNode(
@@ -137,6 +145,7 @@ public class SimpleProcedure
             }
         }
 
+        log.info(" * count saved ndoes: ", count);
         log.info(timer.stopTimer());
 
         log.info(timer_all.stopTimer());

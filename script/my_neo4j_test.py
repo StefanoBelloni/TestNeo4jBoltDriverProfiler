@@ -1,4 +1,6 @@
+import sys
 import functools
+import time
 
 from neo4j.v1 import GraphDatabase
 from neo4j import exceptions as neo4jexception
@@ -15,7 +17,7 @@ def timeit(func):
         r = func(*args, **kwargs)
         elapsed_time = datetime.datetime.now() - start_time
         print('time function {:35} .................... ms # {}'
-              .format("[" + func.__name__ + "]",
+              .format('[' + func.__name__ + ']',
                       int(elapsed_time.total_seconds() * 1000)))
         return r
 
@@ -27,9 +29,10 @@ def timeit(func):
 class Neo4Test:
 
     def __init__(self,
-                 uri="bolt://localhost:7687",
-                 user="neo4j",
-                 password="neo4j"):
+                 uri='bolt://localhost:7687',
+                 user='neo4j',
+                 password='neo4j',
+                 encrypted=False):
 
         # === init neo4j credentials === #
         self.user = user
@@ -40,7 +43,7 @@ class Neo4Test:
             self._driver = GraphDatabase.driver(
                 self.uri, auth=(self.user, self.password))
         except neo4jexception.ServiceUnavailable:
-            raise ConnectionError("Fail to establish connection ...")
+            raise ConnectionError('Fail to establish connection ...')
 
     # ================================= #
 
@@ -48,6 +51,7 @@ class Neo4Test:
         with self._driver.session() as session:
             for index_query in indexes_queries():
                 r = session.run(index_query)
+                r.consume()
 
     @timeit
     def populate(self, s, e, n):
@@ -83,13 +87,13 @@ class Neo4Test:
         deleted_nodes = 1
         cum_deletion = 0
         node_types = [
-            "r:BELONGS",
-            "r:v_BELONGS",
-            "n:parent",
-            "n:v_parent",
-            "n:child",
-            "n:v_child",
-            "n:cache",
+            'r:BELONGS',
+            'r:v_BELONGS',
+            'n:parent',
+            'n:v_parent',
+            'n:child',
+            'n:v_child',
+            'n:cache',
             None
         ]
         for node_type in node_types:
@@ -99,18 +103,20 @@ class Neo4Test:
                     self._clean_graph, node_type)
 
                 cum_deletion += deleted_nodes
-                print("  * cumlative delets: " + str(cum_deletion)
-                      + " last result: " + str(deleted_nodes) + '\r',
-                      end="")
+                print('  * cumlative delets: ' + str(cum_deletion)
+                      + ' last result: ' + str(deleted_nodes) + '\r',
+                      end='')
         return cum_deletion
 
     # +++++++++++++++++++++++++++++++++++++++++++++++ #
 
     @staticmethod
     def __run_populate(tx, n, i):
-        res = tx.run("CALL example.populate($n, $i) YIELD out as o RETURN o",
+        res = tx.run('CALL example.populate($n, $i) YIELD out as o RETURN o',
                      i=i, n=n)
-        return res.single()["o"]
+        n = res.single()['o']
+        res.consume()
+        return n
 
     # +++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -122,9 +128,12 @@ class Neo4Test:
             i = tmp
 
         res = tx.run(
-            "CALL example.calculate.save($i, $j) YIELD out as o RETURN o",
+            'CALL example.calculate.save($i, $j) YIELD out as o RETURN o',
             i=i, j=j)
-        return res.single()["o"]
+        # return res.single()['o']
+        n = res.single()['o']
+        # res.consume()
+        return n
 
     # +++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -144,7 +153,7 @@ def delete_graph_query(type_node):
                 ' DETACH DELETE n \n'
                 ' RETURN count(*);')
 
-    elif type_node.startswith("r:"):
+    elif type_node.startswith('r:'):
         return (' MATCH ()-[' + type_node + ']->() \n '
                                             ' WITH r LIMIT 10000 \n '
                                             ' DELETE r \n'
@@ -156,7 +165,7 @@ def delete_graph_query(type_node):
                                          ' MATCH (n)-[r]-() \n'
                                          ' DELETE n,r \n'
                                          ' RETURN count(*);')
-    return ""
+    return ''
 
 
 def indexes_queries():
@@ -173,26 +182,28 @@ def indexes_queries():
 #                        #    ##### #####    #                                #
 # =========================================================================== #
 
-def run_test():
 
-    print("Connect to neo4j ...")
-    d = Neo4Test()
+if __name__ == '__main__':
 
-    print("Creating indexes")
-    d.init_indexes()
 
-    print("Populating graph ...")
-    count = d.populate(0, 500, 1000)
-    print("  -> saved ", count, " nodes")
+    time.sleep(3)
+    if 'prepare' in sys.argv:
+        d = Neo4Test()
+        print('Creating indexes')
+        d.init_indexes()
+        print('Populate graph')
+        count = d.populate(0, 500, 1000)
 
-    print("call: 'Loading sub-graph and saving cache ...'")
-    count = d.calculate_save(0, 80000)
-    print("  -> saved ", count, " nodes in cache")
+    time.sleep(3)
+    if 'save' in sys.argv:
+        d = Neo4Test()
+        print('call: "Loading sub-graph and saving cache ..."')
+        count = d.calculate_save(0, 80000)
 
-    print("cleanup")
-    d.clean()
+    time.sleep(3)
+    if 'clean' in sys.argv:
+        d = Neo4Test()
+        print('cleanup')
+        d.clean()
 
 # =========================================================================== #
-
-if __name__ == "__main__":
-    run_test()

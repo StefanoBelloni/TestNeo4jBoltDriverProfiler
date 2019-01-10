@@ -1,0 +1,14 @@
+NOTE:
+  * compilation via apt gives the wrong *.h file in /usr/include
+    mkdir cleishm
+    cd cleishm/
+    git clone https://github.com/cleishm/libneo4j-client.git .
+    sudo apt install libedit-dev
+    sudo apt install libcypher-parser-dev
+    ./autogen.sh 
+    ./configure 
+   
+  * Explicit export LD_LIBRARY_PATH
+      export LD_LIBRARY_PATH=/usr/local/lib
+
+
